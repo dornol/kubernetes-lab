@@ -3,8 +3,9 @@ openssl rand -base64 32
 
 kubectl create secret generic oauth2-proxy-secret \
 --namespace oauth2-proxy \
---from-literal=OAUTH2_PROXY_CLIENT_SECRET="my-oauth2-secret" \
---from-literal=OAUTH2_PROXY_COOKIE_SECRET="my-cookie-secret" \
+--from-literal=client-id="my-client-id" \
+--from-literal=client-secret="my-oauth2-secret" \
+--from-literal=cookie-secret="my-cookie-secret" \
 --dry-run=client -o yaml > oauth2-proxy-secret.yaml
 
 kubeseal --controller-namespace kube-system \
