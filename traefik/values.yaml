@@ -1,0 +1,85 @@
+service:
+  type: LoadBalancer
+
+ports:
+  web:
+    port: 80
+    expose:
+      default: true
+    exposedPort: 80
+    enabled: true
+
+  websecure:
+    port: 443
+    expose:
+      default: true
+    exposedPort: 443
+    enabled: true
+
+  gitlab-shell:
+    port: 2222
+    expose:
+      default: true
+    exposedPort: 2222
+    protocol: TCP
+    enabled: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ucceoum@gmail.com
+      storage: /data/acme.json
+      httpChallenge:
+        entryPoint: web
+
+persistence:
+  enabled: true
+  storageClass: local-path
+  accessMode: ReadWriteOnce
+  size: 128Mi
+  path: /data
+
+
+additionalContainers:
+  - name: volume-permissions
+    image: busybox:1.35
+    command: ["sh", "-c", "touch /data/acme.json && chmod 600 /data/acme.json"]
+    volumeMounts:
+      - name: data
+        mountPath: /data
+
+metrics:
+  prometheus:
+    enabled: true
+
+ingressRoute:
+  dashboard:
+    enabled: true
+    matchRule: Host(`traefik.home.dornol.dev`) && (PathPrefix(`/dashboard`) || PathPrefix(`/api`))
+    services:
+      - name: api@internal
+        kind: TraefikService
+    entryPoints: ["websecure"]
+    middlewares:
+      - name: dashboard-auth
+        namespace: traefik
+    tls:
+      certResolver: letsencrypt
+
+
+additionalArguments:
+  - "--entrypoints.gitlab-shell.address=:2222"
+
+logs:
+  general:
+    level: "DEBUG"
+
+
+securityContext:
+  capabilities:
+    drop: [ALL]
+    add: [NET_BIND_SERVICE]
+  readOnlyRootFilesystem: true
+  runAsGroup: 0
+  runAsNonRoot: false
+  runAsUser: 0

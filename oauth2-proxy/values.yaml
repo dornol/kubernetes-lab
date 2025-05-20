@@ -1,0 +1,35 @@
+config:
+  clientID: "oauth2-proxy-client"                # Keycloak 클라이언트 ID
+  cookieDomain: "home.dornol.dev"
+  skipAuthRoutes:
+    - "^/oauth2/"
+    - "^/metrics"
+  setXAuthRequest: true
+  emailDomains:
+    - "*"
+  configFile: |-
+    upstreams = ["static://200"]
+    email_domains=["*"]
+
+extraEnvFromSecrets:
+  - name: oauth2-proxy-secret
+
+extraArgs:
+  provider: oidc
+  oidc-issuer-url: https://keycloak.home.dornol.dev/realms/dev
+  provider-display-name: Keycloak
+  pass-authorization-header: true
+  #  code-challenge-method: S256
+  redirect-url: https://oauth2-proxy.home.dornol.dev/oauth2/callback
+  cookie-domain: .home.dornol.dev
+  whitelist-domain: .home.dornol.dev
+  silence-ping-logging: true
+  skip-provider-button: true
+
+service:
+  type: ClusterIP
+  portNumber: 80
+  addProtocol: http
+
+ingress:
+  enabled: false

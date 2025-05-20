@@ -1,0 +1,76 @@
+global:
+  hosts:
+    domain: home.dornol.dev
+    gitlab:
+      name: git.home.dornol.dev
+      https: true
+    registry:
+      name: registry.git.home.dornol.dev
+      https: true
+    minio:
+      name: minio.git.home.dornol.dev
+      https: true
+    kas:
+      name: kas.git.home.dornol.dev
+      https: true
+  ingress:
+    enabled: true
+    configureCertmanager: false
+    provider: traefik
+    class: traefik
+    tls:
+      enabled: false
+    annotations:
+      traefik.ingress.kubernetes.io/router.tls: "true"
+      traefik.ingress.kubernetes.io/router.tls.certresolver: letsencrypt
+      traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  shell:
+    port: 2222
+
+  gitlab-shell:
+    traefik:
+      entrypoint: "gitlab-shell"
+
+  appConfig:
+    omniauth:
+      enabled: true
+      autoLinkUser: ['openid_connect']
+      allowSingleSignOn: ['openid_connect']
+      blockAutoCreatedUsers: false
+      providers:
+        - secret: gitlab-keycloak-oauth2
+
+nginx-ingress:
+  enabled: false
+
+gitlab-runner:
+  install: true
+  rbac:
+    create: true
+  runners:
+    locked: false
+    secret: "nonempty"
+    config: |
+      [[runners]]
+        [runners.kubernetes]
+        image = "ubuntu:22.04"
+        {{- if .Values.global.minio.enabled }}
+        [runners.cache]
+          Type = "s3"
+          Path = "gitlab-runner"
+          Shared = true
+          [runners.cache.s3]
+            ServerAddress = {{ include "gitlab-runner.cache-tpl.s3ServerAddress" . }}
+            BucketName = "runner-cache"
+            BucketLocation = "us-east-1"
+            Insecure = false
+        {{ end }}
+  podAnnotations:
+    gitlab.com/prometheus_scrape: "true"
+    gitlab.com/prometheus_port: 9252
+  podSecurityContext:
+    seccompProfile:
+      type: "RuntimeDefault"
+
+
+installCertmanager: false

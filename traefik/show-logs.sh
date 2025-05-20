@@ -1,0 +1,1 @@
+microk8s kubectl logs -f -l app.kubernetes.io/instance=traefik-traefik -n traefik

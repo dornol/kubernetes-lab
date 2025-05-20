@@ -1,0 +1,8 @@
+# 🔐 Backup sealed-secrets key pair
+kubectl get secret sealed-secrets-key -n kube-system -o yaml > sealed-secrets-key-backup.yaml
+
+# 🧯 Restore (Must be applied *before* sealed-secrets-controller starts)
+kubectl apply -f sealed-secrets-key-backup.yaml
+
+# 💡 Tip: After restoring, restart the controller to ensure it picks up the restored key
+kubectl delete pod -l name=sealed-secrets-controller -n kube-system

@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-svc-test
+  namespace: test
+spec:
+  ports:
+    - port: 8800
+      targetPort: 8800
+
+---
+
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-svc-test
+  namespace: test
+subsets:
+  - addresses:
+      - ip: 172.30.0.100
+    ports:
+      - port: 8800
+
+---
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: external-svc-test
+  namespace: test
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`ext2.home.dornol.dev`)
+      kind: Rule
+      services:
+        - name: external-svc-test
+          port: 8800
+  tls:
+    certResolver: letsencrypt
