@@ -54,6 +54,7 @@ gitlab-runner:
       [[runners]]
         [runners.kubernetes]
         image = "ubuntu:22.04"
+        privileged = true
         {{- if .Values.global.minio.enabled }}
         [runners.cache]
           Type = "s3"
