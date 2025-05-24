@@ -45,18 +45,33 @@ nginx-ingress:
 
 installCertmanager: false
 
-gitlab:
-  gitlab-runner:
-    install: true
-    rbac:
-      create: true
-    runners:
-      image: docker:24.0.2
-      privileged: true
-      executor: kubernetes
-    podAnnotations:
-      gitlab.com/prometheus_scrape: "true"
-      gitlab.com/prometheus_port: 9252
-    podSecurityContext:
-      seccompProfile:
-        type: "RuntimeDefault"
+gitlab-runner:
+  install: true
+  rbac:
+    create: true
+  runners:
+    locked: false
+    secret: "nonempty"
+    config: |
+      [[runners]]
+        [runners.kubernetes]
+        namespace = "{{.Release.Namespace}}"
+        image = "ubuntu:22.04"
+        privileged = true
+        {{- if .Values.global.minio.enabled }}
+        [runners.cache]
+          Type = "s3"
+          Path = "gitlab-runner"
+          Shared = true
+          [runners.cache.s3]
+            ServerAddress = {{ include "gitlab-runner.cache-tpl.s3ServerAddress" . }}
+            BucketName = "runner-cache"
+            BucketLocation = "us-east-1"
+            Insecure = false
+        {{ end }}
+  podAnnotations:
+    gitlab.com/prometheus_scrape: "true"
+    gitlab.com/prometheus_port: 9252
+  podSecurityContext:
+    seccompProfile:
+      type: "RuntimeDefault"
