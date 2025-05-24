@@ -43,21 +43,20 @@ global:
 nginx-ingress:
   enabled: false
 
-gitlab-runner:
-  install: true
-  rbac:
-    create: true
-  runners:
-    image: docker:24.0.2
-    privileged: true
-    tags: ["docker"]
-    executor: kubernetes
-  podAnnotations:
-    gitlab.com/prometheus_scrape: "true"
-    gitlab.com/prometheus_port: 9252
-  podSecurityContext:
-    seccompProfile:
-      type: "RuntimeDefault"
-
-
 installCertmanager: false
+
+gitlab:
+  gitlab-runner:
+    install: true
+    rbac:
+      create: true
+    runners:
+      image: docker:24.0.2
+      privileged: true
+      executor: kubernetes
+    podAnnotations:
+      gitlab.com/prometheus_scrape: "true"
+      gitlab.com/prometheus_port: 9252
+    podSecurityContext:
+      seccompProfile:
+        type: "RuntimeDefault"
