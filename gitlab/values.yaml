@@ -47,10 +47,12 @@ installCertmanager: false
 
 gitlab-runner:
   install: true
-  image:
-    image: docker:24.0.2
   rbac:
     create: true
+  runners:
+    privileged: true
+    image: docker:24.0.2
+    executor: kubernetes
   podAnnotations:
     gitlab.com/prometheus_scrape: "true"
     gitlab.com/prometheus_port: 9252
