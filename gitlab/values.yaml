@@ -58,10 +58,6 @@ gitlab-runner:
         [runners.kubernetes]
           image: "ubuntu:20.04"
           privileged = true
-        [[runners.kubernetes.volumes.empty_dir]]
-          name = "docker-certs"
-          mount_path = "/certs/client"
-          medium = "Memory"
   podAnnotations:
     gitlab.com/prometheus_scrape: "true"
     gitlab.com/prometheus_port: 9252
