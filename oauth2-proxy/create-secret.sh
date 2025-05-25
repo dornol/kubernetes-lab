@@ -13,3 +13,4 @@ kubeseal --controller-namespace kube-system \
          --format yaml \
          --namespace oauth2-proxy \
          < oauth2-proxy-secret.yaml > sealed-oauth2-proxy-secret.yaml
+         
