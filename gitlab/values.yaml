@@ -56,7 +56,7 @@ gitlab-runner:
     config: |
       [[runners]]
         [runners.kubernetes]
-          image: "ubuntu:20.04"
+          image = "ubuntu:20.04"
           privileged = true
   podAnnotations:
     gitlab.com/prometheus_scrape: "true"
