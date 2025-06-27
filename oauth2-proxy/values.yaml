@@ -12,7 +12,8 @@ config:
     email_domains=["*"]
 
 envFrom:
-  - secretRef: oauth2-proxy-secret
+  - secretRef:
+      name: oauth2-proxy-secret
 
 extraArgs:
   provider: oidc
