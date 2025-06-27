@@ -11,8 +11,8 @@ config:
     upstreams = ["static://200"]
     email_domains=["*"]
 
-extraEnvFromSecrets:
-  - name: oauth2-proxy-secret
+envFrom:
+  - secretRef: oauth2-proxy-secret
 
 extraArgs:
   provider: oidc
