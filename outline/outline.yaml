@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: outline
+  name: outline
+  labels:
+    app: outline
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: outline
+  template:
+    metadata:
+      namespace: outline
+      name: outline
+      labels:
+        app: outline
+    spec:
+      containers:
+        - name: outline
+          image: docker.getoutline.com/outlinewiki/outline:latest
+          envFrom:
+            - configMapRef:
+                name: outline-env
+            - secretRef:
+                name: outline-secret
+          volumeMounts:
+            - mountPath: /var/lib/outline/data
+              name: database-data
+      volumes:
+        - name: storage-data
+          persistentVolumeClaim:
+            claimName: storage-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: outline
+  name: outline
+spec:
+  ports:
+    - port: 3000
+      targetPort: 3000
+  selector:
+    app: outline
+
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: outline
+  name: storage-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
